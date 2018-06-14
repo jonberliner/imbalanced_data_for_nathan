@@ -19,9 +19,8 @@ def experiment(X, y, model, p_train=0.7):
     Returns:
         accuracy (dict): accuracies for train and val(idation) splits
         auc (dict): roc aucs for each split
-        # NOTE: not returning these atm
-        # model: the trained model
-        # splits (dict): the indices of data points in train and val splits"""
+        model: the trained model
+        splits (dict): the indices of data points in train and val splits"""
     # returns split into train and val splits, trying to keep labels balanced
     # between splits
     splits = split_inds(len(X), p_train, balanced=True, labels=y)
@@ -103,13 +102,14 @@ if __name__ == '__main__':
     W = rng.randn(1, DIM_X)
     b = rng.randn(DIM_X)
     y = (rng.rand(N_SAM) < P_MAJORITY_CLASS).astype(int)
-    # NOTE: @ is matrix multiplication
-    X = (y.astype(np.float32)[:, None] @ W) + b + rng.randn(N_SAM, DIM_X) * EPS
+    _y = y.astype(np.float32)[:, None]  # cast for matmul
+    noise = rng.randn(N_SAM, DIM_X) * EPS
+    X = np.matmul(_y, W) + b + noise
 
     # vis the data
     vX = TSNE().fit_transform(X)
     plt.ion()
-    fig, ax  = plt.subplots()
+    fig, ax = plt.subplots()
     ax.scatter(vX[y==0][:, 0], vX[y==0][:, 1], color='red', label='minority class')
     ax.scatter(vX[y==1][:, 0], vX[y==1][:, 1], color='blue', label='majority class')
     plt.title('TSNE of our data')
