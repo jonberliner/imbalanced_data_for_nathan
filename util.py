@@ -60,4 +60,3 @@ def split_inds(inds, p_splits, balanced=False, labels=None, seed=None):
         #     split_inds[split] = np.concatenate([split_inds[split],
         #                                          inds[i_start:]], 0)
     return split_inds
-
