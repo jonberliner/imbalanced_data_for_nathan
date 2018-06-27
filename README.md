@@ -9,6 +9,7 @@ atm, need to manually rewrite main script to take in your real data instead of s
 + **main.py**: defines and runs experiments with different balancing methods
 + **balanced_samplers.py**: functions for sampling data to get class balance
 + **util.py**: contains function for cross validation
++ Hi Nathan.  Lebron is coming to Philly
 
 ## data
 + **nathan_rat_data.csv**
