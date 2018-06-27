@@ -4,17 +4,11 @@ from matplotlib import pyplot as plt
 import os
 from time import time
 
-FORCE_RELOAD = False
-FORCE_REPREP = False
-
-DATA_PATH = 'nathan_data.csv'
-PREPPED_DATA_PATH = 'prepped_nathan_data.csv'
-
 COLUMN_NAMES = ['brain_region_id',
                 'mouse_id',
                 'neuron_in_brain_region_id',
                 'neuron_activity_au',
-                'level_press_id',  # 0 for no press, 1 for left, 2 for right
+                'lever_press_id',  # 0 for no press, 1 for left, 2 for right
                 'cs_id']  # 0 for no CS, 1 for positive, 2 for negative
 
 
@@ -49,7 +43,7 @@ def prep_df(data_path, prepped_data_path):
     df = df.groupby('neuron_id')\
            .apply(add_timestep)\
            .reset_index()\
-           .drop(['index'], axis=1)
+           .drop(['index', 'Unnamed: 0'], axis=1)
 
     print(f'saving to {prepped_data_path}...')
     df.to_csv(prepped_data_path)
@@ -57,17 +51,28 @@ def prep_df(data_path, prepped_data_path):
     return df
 
 
-if 'df' not in locals() or FORCE_RELOAD:
-    print(f'loading or creating prepped data...')
-    if (not os.path.exists(PREPPED_DATA_PATH)) or FORCE_REPREP:
-        # reprep from original data from nathan
-        print('reprepping data from {DATA_PATH} to {PREPPED_DATA_PATH}...')
-        df = prep_df(DATA_PATH, PREPPED_DATA_PATH)
+def data_prep(data_path, prepped_data_path, force_reload, force_reprep):
+    if 'df' not in globals() or force_reload:
+        print(f'loading or creating prepped data...')
+        if (not os.path.exists(prepped_data_path)) or force_reprep:
+            # reprep from original data from nathan
+            print('reprepping data from {data_path} to {prepped_data_path}...')
+            df = prep_df(data_path, prepped_data_path)
+        else:
+            # load last saved prep
+            print(f'loading prepped data from {prepped_data_path}...')
+            df = pd.read_csv(prepped_data_path)
     else:
-        # load last saved prep
-        print(f'loading prepped data from {PREPPED_DATA_PATH}...')
-        df = pd.read_csv(PREPPED_DATA_PATH)
-else:
-    print('df already in locals().  change FORCE_RELOAD to True if want to',
-          'force reload and/or reprep')
+        print('df already in locals().  change force_reload to True if want',
+              'to force reload and/or reprep')
+    return df
 
+
+if __name__ == '__main__':
+    FORCE_RELOAD = True
+    FORCE_REPREP = True
+
+    DATA_PATH = 'nathan_data.csv'
+    PREPPED_DATA_PATH = 'prepped_nathan_data.csv'
+
+    df = data_prep(DATA_PATH, PREPPED_DATA_PATH, FORCE_RELOAD, FORCE_REPREP)
